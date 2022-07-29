@@ -10,7 +10,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
     
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://psjcnapyyvpiut:b60a4b24457fc0334328454d668ab7acc35e41d33dac51735920f1e55d78de03@ec2-44-208-88-195.compute-1.amazonaws.com:5432/dejf4e83sch3be'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Htoowaiyan2014@localhost/chapter3db'
 try:
     prodURI = os.getenv('DATABASE_URL')
     prodURI = prodURI.replace("postgres://", "postgresql://")
@@ -18,6 +18,7 @@ try:
 
 except:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
     
 bootstrap = Bootstrap(app)
 db = SQLAlchemy(app)
@@ -29,7 +30,11 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True)
     email = db.Column(db.String(40), unique=True)
-    password = db.Column(db.String(60))
+    password = db.Column(db.String(100))
+
+@app.before_first_request
+def create_table():
+    db.create_all()
 
 @login_manager.user_loader
 def load_user(user_id):
